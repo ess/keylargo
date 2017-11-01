@@ -22,8 +22,6 @@ import (
 	"io"
 	"os"
 	"strings"
-
-	"github.com/DATA-DOG/godog"
 )
 
 // Command is an interface that describes the sorts of commands that keylargo
@@ -34,6 +32,13 @@ type Command interface {
 	Execute() error
 }
 
+// Suite is an interface that describes the parts of the *godog.Suite
+// implementation that we actually use.
+type Suite interface {
+	Step(interface{}, interface{})
+	BeforeScenario(func(interface{}))
+}
+
 var rootCmd Command
 var commandOutput string
 var lastCommandRanErr error
@@ -41,10 +46,10 @@ var lastCommandRanErr error
 // StepUp, given a godog suite, adds the keylargo step definitions and
 // state cleanup to that suite. Effectively, this should be called in
 // your godog suite setup.
-func StepUp(s *godog.Suite) {
+func StepUp(s Suite) {
 	s.Step(`^I run "([^"]*)"$`, iRun)
-	s.Step(`the command succeeds`, theCommandSucceeds)
-	s.Step(`the command fails`, theCommandFails)
+	s.Step(`^the command succeeds$`, theCommandSucceeds)
+	s.Step(`^the command fails$`, theCommandFails)
 
 	s.BeforeScenario(func(interface{}) {
 		commandOutput = ""
