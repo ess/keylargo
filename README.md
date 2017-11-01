@@ -207,4 +207,5 @@ func terminator() string {
 
 ## History ##
 
+* v0.1.0 - No hard godog dependencies
 * v0.0.1 - Initial release
