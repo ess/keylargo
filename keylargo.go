@@ -1,3 +1,17 @@
+// Copyright © 2017 Dennis Walters
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // Package keylargo adds minimal Aruba-like functionality to a godog test
 // suite.
 package keylargo
@@ -8,8 +22,6 @@ import (
 	"io"
 	"os"
 	"strings"
-
-	"github.com/DATA-DOG/godog"
 )
 
 // Command is an interface that describes the sorts of commands that keylargo
@@ -20,6 +32,13 @@ type Command interface {
 	Execute() error
 }
 
+// Suite is an interface that describes the parts of the *godog.Suite
+// implementation that we actually use.
+type Suite interface {
+	Step(interface{}, interface{})
+	BeforeScenario(func(interface{}))
+}
+
 var rootCmd Command
 var commandOutput string
 var lastCommandRanErr error
@@ -27,10 +46,10 @@ var lastCommandRanErr error
 // StepUp, given a godog suite, adds the keylargo step definitions and
 // state cleanup to that suite. Effectively, this should be called in
 // your godog suite setup.
-func StepUp(s *godog.Suite) {
+func StepUp(s Suite) {
 	s.Step(`^I run "([^"]*)"$`, iRun)
-	s.Step(`the command succeeds`, theCommandSucceeds)
-	s.Step(`the command fails`, theCommandFails)
+	s.Step(`^the command succeeds$`, theCommandSucceeds)
+	s.Step(`^the command fails$`, theCommandFails)
 
 	s.BeforeScenario(func(interface{}) {
 		commandOutput = ""
