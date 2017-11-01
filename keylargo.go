@@ -12,6 +12,9 @@ import (
 	"github.com/DATA-DOG/godog"
 )
 
+// Command is an interface that describes the sorts of commands that keylargo
+// is able to test. Basically, we have to be able to set up the ARGS for the
+// command, and we have to actually be able to execute it.
 type Command interface {
 	SetArgs([]string)
 	Execute() error

@@ -1,4 +1,4 @@
-Keylargo is a set [godog](https://github.com/DATA-DOG/godog) helpers for in-process CLI application testing. In essence, it is a minimal [Aruba](https://github.com/cucumber/aruba)-like experience.
+Keylargo is a set of [godog](https://github.com/DATA-DOG/godog) helpers for in-process CLI application testing. In essence, it is a minimal [Aruba](https://github.com/cucumber/aruba)-like experience.
 
 ## Why? ##
 
@@ -34,6 +34,22 @@ type Command interface {
 You can use any CLI framework you like (or just roll your own implementation), but a great example of an object that already implements this interface is `*cobra.Command` from [cobra](https://github.com/spf13/cobra).
 
 Also, in order for keylargo to actually run your command, you'll need to set it as the root command via `keylargo.SetRootCmd(yourCommand)`, most likely in your godog suite setup (see `main_test.go` below).
+
+Finally, it is worth pointing out that this whole thing falls apart if the command (or any of its dependencies) should call `os.Exit()` (or more or less anything else that would normally cause program termination). Instead, it's expected that the command will bubble any and all errors up to the top level.
+
+### Keylargo Steps ###
+
+Keylargo adds the following steps to the suite:
+
+* `When I run "command and its args"` is used to actually run the command
+* `Then the command succeeds` is used to indicate that we expect the command to return no error
+* `Then the command fails` is used to indicate that we expect the command to return an error
+
+### Keylargo Helpers ###
+
+Keylargo containst he following helper functions that can be used to compose your own steps:
+
+* `keylargo.LastCommandOutput()` is a string that contains the captured output for the last command ran via the `When I run` step.
 
 ### features/echo.feature ###
 
